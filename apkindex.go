@@ -1,17 +1,114 @@
 package apk
 
+import (
+	"archive/tar"
+	"compress/gzip"
+	"io"
+	"io/ioutil"
+	"os"
+	"path/filepath"
+)
+
+var (
+	APKIndexFile    = "APKINDEX"
+	DescriptionFile = "DESCRIPTION"
+)
+
 // APKIndex represents the data stored in an APKINDEX.tar.gz file
 type APKIndex struct {
-	Description string
+	Description []byte
 	Packages    Packages
 }
 
 // NewAPKIndex takes a filename containing an APKINDEX.tar.gz file,
 // un-tars it, and processes the relevant files 'APKINDEX', and 'DESCRIPTION'
 func NewAPKIndex(fn string) (a APKIndex, err error) {
-	// download
+	// create tmpdir
+	dir, err := ioutil.TempDir("", "")
+	if err != nil {
+		return
+	}
 
-	a.Packages, err = ReadPackages(fn)
+	// extract fn to tmpdir
+	err = extract(fn, dir)
+	if err != nil {
+		return
+	}
+
+	// read tmpdir/DESCRIPTION into a.Description
+	a.Description, err = ioutil.ReadFile(filepath.Join(dir, DescriptionFile))
+	if err != nil {
+		return
+	}
+
+	// read tmpdir/APKINDEX into packages
+	a.Packages, err = ReadPackages(filepath.Join(dir, APKIndexFile))
 
 	return
+}
+
+func extract(fn, dir string) (err error) {
+	f, err := os.Open(fn)
+	if err != nil {
+		return
+	}
+
+	decompressor, err := gzip.NewReader(f)
+	if err != nil {
+		return
+	}
+
+	defer decompressor.Close()
+
+	tr := tar.NewReader(decompressor)
+	return decompressLoop(tr, dir)
+}
+
+func decompressLoop(tr *tar.Reader, dest string) (err error) {
+	var header *tar.Header
+	for {
+		header, err = tr.Next()
+
+		switch {
+		case err == io.EOF:
+			return nil
+		case err != nil:
+			return
+		case header == nil:
+			continue
+		}
+
+		// the target location where the dir/file should be created
+		target := filepath.Join(dest, header.Name)
+
+		// ensure the parent directory exists in situations where a single file,
+		// with missing toplevel dir, is compressed.
+		//
+		// This seemingly weird case exists in some tarballs in our test cases, so
+		// it can definitely happen. I'd love to understand more /shrug
+		err = os.MkdirAll(filepath.Dir(target), 0755)
+		if err != nil {
+			return
+		}
+
+		switch header.Typeflag {
+		case tar.TypeDir:
+			if _, err := os.Stat(target); err != nil {
+				if err := os.MkdirAll(target, 0755); err != nil {
+					return err
+				}
+			}
+		case tar.TypeReg:
+			f, err := os.OpenFile(target, os.O_CREATE|os.O_RDWR, os.FileMode(header.Mode))
+			if err != nil {
+				return err
+			}
+
+			if _, err := io.Copy(f, tr); err != nil {
+				return err
+			}
+
+			f.Close()
+		}
+	}
 }
