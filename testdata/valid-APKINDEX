@@ -1,0 +1,29 @@
+C:Q1dTJEpaP6rFsNwSi7Jv1VMSn210Y=
+P:perl-spreadsheet-xlsx-doc
+V:0.15-r2
+A:x86_64
+S:8311
+I:32768
+T:Perl extension for reading MS Excel 2007 files; (documentation)
+U:https://metacpan.org/release/Spreadsheet-XLSX/
+L:GPL-1.0-or-later OR Artistic-1.0-Perl
+o:perl-spreadsheet-xlsx
+m:Timothy Legge <timlegge@gmail.com>
+t:1600709946
+c:d6c3468ca0e4c77c124334070b6e648714ace8a8
+i:docs perl-spreadsheet-xlsx=0.15-r2
+
+C:Q1lpe7F/Md0FfJgtDvB10lZFIXiw8=
+P:tesseract-ocr-data-ces
+V:4.1.1-r5
+A:x86_64
+S:7091383
+I:16257024
+T:Tesseract language data for ces
+U:https://github.com/tesseract-ocr/tesseract/releases
+L:Apache-2.0
+o:tesseract-ocr
+m:Francesco Colista <fcolista@alpinelinux.org>
+t:1608546497
+c:dd0aaf6750718b0ff739b662eb33e2d7cf59935a
+D:tesseract-ocr
