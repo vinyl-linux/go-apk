@@ -55,12 +55,12 @@ func download(u string, dir string) (path string, err error) {
 	}
 
 	path = filepath.Join(dir, filepath.Base(u1.Path))
-	out, err := os.Create(path)
+	out, err := os.Create(path) // #nosec: G304
 	if err != nil {
 		return
 	}
 
-	defer out.Close()
+	defer out.Close() // #nosec: G307
 
 	resp, err := http.Get(u1.String())
 	if err != nil {

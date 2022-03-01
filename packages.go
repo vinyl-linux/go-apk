@@ -22,11 +22,12 @@ func ReadPackages(fn string) (p Packages, err error) {
 
 	p = make(Packages, 0)
 
-	f, err := os.Open(fn)
+	f, err := os.Open(fn) // #nosec: G304
 	if err != nil {
 		return
 	}
-	defer f.Close()
+
+	defer f.Close() // #nosec: G307
 
 	scanner := bufio.NewScanner(f)
 
