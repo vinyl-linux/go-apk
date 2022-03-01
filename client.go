@@ -37,9 +37,9 @@ func (c Client) DownloadIndex() (path string, err error) {
 // DownloadPackage accepts a package, as parsed from an APKIndex file, and
 // stores it in the vinyl cache directory
 func (c Client) DownloadPackage(pkg *Package) (path string, err error) {
-	u := fmt.Sprintf("%s/%s-%s.apk", c.BaseURL, pkg.Name, pkg.Version.String())
+	u := fmt.Sprintf("%s/%s-%s.apk", c.BaseURL, pkg.Name, pkg.Version)
 
-	dir := filepath.Join(BaseDir, pkg.Name, pkg.Version.String())
+	dir := filepath.Join(BaseDir, pkg.Name, pkg.Version)
 	err = os.MkdirAll(dir, 0750)
 	if err != nil {
 		return

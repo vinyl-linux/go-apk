@@ -7,8 +7,6 @@ import (
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/hashicorp/go-version"
 )
 
 // Packages holds a series of packages, as described in an APKINDEX file
@@ -67,24 +65,24 @@ func ReadPackages(fn string) (p Packages, err error) {
 // Keys and names and stuff are taken from
 // https://github.com/alpinelinux/apk-tools/blob/da8d83338b7daa2bbd2e940f94d6515d69568800/src/apk_adb.c#L56-L76
 type Package struct {
-	ID            string           `apk:"C"`
-	Name          string           `apk:"P"`
-	Version       *version.Version `apk:"V"`
-	Description   string           `apk:"T"`
-	URL           string           `apk:"U"`
-	InstalledSize int              `apk:"I"`
-	FileSize      int              `apk:"S"`
-	Licence       string           `apk:"L"`
-	Arch          string           `apk:"A"`
-	Dependencies  []string         `apk:"D"`
-	InstallIf     string           `apk:"i"`
-	Provides      []string         `apk:"p"`
-	Origin        string           `apk:"o"`
-	Maintainer    string           `apk:"m"`
-	BuildTime     time.Time        `apk:"t"`
-	RepoCommit    string           `apk:"c"`
-	Replaces      string           `apk:"r"`
-	Priority      int              `apk:"k"`
+	ID            string    `apk:"C"`
+	Name          string    `apk:"P"`
+	Version       string    `apk:"V"`
+	Description   string    `apk:"T"`
+	URL           string    `apk:"U"`
+	InstalledSize int       `apk:"I"`
+	FileSize      int       `apk:"S"`
+	Licence       string    `apk:"L"`
+	Arch          string    `apk:"A"`
+	Dependencies  []string  `apk:"D"`
+	InstallIf     string    `apk:"i"`
+	Provides      []string  `apk:"p"`
+	Origin        string    `apk:"o"`
+	Maintainer    string    `apk:"m"`
+	BuildTime     time.Time `apk:"t"`
+	RepoCommit    string    `apk:"c"`
+	Replaces      string    `apk:"r"`
+	Priority      int       `apk:"k"`
 }
 
 // DecodePackage takes a block of text and tries to decode a
@@ -113,14 +111,6 @@ func DecodePackage(in string) (*Package, error) {
 		switch tt := field.Type.String(); tt {
 		case "string":
 			val.SetString(setVal)
-
-		case "*version.Version", "*Version":
-			ver, err := version.NewVersion(setVal)
-			if err != nil {
-				return p, err
-			}
-
-			val.Set(reflect.ValueOf(ver))
 
 		case "[]string":
 			val.Set(reflect.ValueOf(strings.Fields(setVal)))
